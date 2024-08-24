@@ -1,13 +1,14 @@
 # Mushroom Database
 
-1. Sources: 
+## Sources:
     (a) Mushroom records drawn from The Audubon Society Field Guide to North
         American Mushrooms (1981). G. H. Lincoff (Pres.), New York: Alfred
         A. Knopf
     (b) Donor: Jeff Schlimmer (Jeffrey.Schlimmer@a.gp.cs.cmu.edu)
     (c) Date: 27 April 1987
+    (d) EDU: https://archive.ics.uci.edu/dataset/73/mushroom
 
-2. Past Usage:
+## Past Usage
     1. Schlimmer,J.S. (1987). Concept Acquisition Through Representational
        Adjustment (Technical Report 87-19).  Doctoral disseration, Department
        of Information and Computer Science, University of California, Irvine.
@@ -89,7 +90,7 @@
 	we have found.
 
 
-3. Relevant Information:
+## Relevant Information
     This data set includes descriptions of hypothetical samples
     corresponding to 23 species of gilled mushrooms in the Agaricus and
     Lepiota Family (pp. 500-525).  Each species is identified as
@@ -99,11 +100,10 @@
     determining the edibility of a mushroom; no rule like ``leaflets
     three, let it be'' for Poisonous Oak and Ivy.
 
-4. Number of Instances: 8124
+    Number of Instances: 8124
+    Number of Attributes: 22 (all nominally valued)
 
-5. Number of Attributes: 22 (all nominally valued)
-
-6. Attribute Information: (classes: edible=e, poisonous=p)
+## Attribute Information: (classes: edible=e, poisonous=p)
      1. cap-shape:                bell=b,conical=c,convex=x,flat=f,
                                   knobbed=k,sunken=s
      2. cap-surface:              fibrous=f,grooves=g,scaly=y,smooth=s
@@ -139,10 +139,11 @@
     22. habitat:                  grasses=g,leaves=l,meadows=m,paths=p,
                                   urban=u,waste=w,woods=d
 
-7. Missing Attribute Values: 2480 of them (denoted by "?"), all for
-   attribute #11.
+## Missing Attribute Values
+    2480 of them (denoted by "?"), 
+    all for attribute #11.
 
-8. Class Distribution: 
+## Class Distribution 
     --    edible: 4208 (51.8%)
     -- poisonous: 3916 (48.2%)
     --     total: 8124 instances
