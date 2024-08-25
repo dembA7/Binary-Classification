@@ -62,6 +62,7 @@ def gradient_descent(X, y, weights, learning_rate, epochs):
         @see https://www.youtube.com/watch?v=IHZwWFHWa-w
         @see https://www.youtube.com/watch?v=sDv4f4s2SB8
     """
+    costs = []
     m = X.shape[0]
 
     for i in range(epochs):
@@ -70,9 +71,10 @@ def gradient_descent(X, y, weights, learning_rate, epochs):
         gradient = np.dot(X.T, (h - y)) / m
         weights -= learning_rate * gradient
         cost = compute_cost(X, y, weights)
+        costs.append(cost)
         print(f"Epoch {i + 1}, Cost: {cost}")
 
-    return weights
+    return weights, costs
 
 
 def split_dataset(X, y, test_size=0.2, random_state=None):

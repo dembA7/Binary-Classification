@@ -13,7 +13,6 @@ Este módulo contiene las funciones necesarias para visualizar los resultados de
 @see https://towardsdatascience.com/understanding-confusion-matrix-a9ad42dcfd62
 """
 
-
 def confusion_matrix(y_true, y_pred):
     """
     Crea una matriz de confusión para los valores verdaderos y predichos.
@@ -33,7 +32,7 @@ def confusion_matrix(y_true, y_pred):
     return matrix
 
 
-def plot_confusion_matrix(cm, classes, title):
+def plot_confusion_matrix(cm, classes):
     """
     Dibuja una matriz de confusión.
 
@@ -52,7 +51,6 @@ def plot_confusion_matrix(cm, classes, title):
 
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
-    plt.title(title)
 
     # Añadir los valores numéricos a cada celda
     for i in range(cm.shape[0]):
@@ -77,7 +75,6 @@ def plot_accuracy(test_accuracy, train_accuracy):
 
     ax.set_ylim(0, 100)
     ax.set_ylabel('Accuracy (%)')
-    ax.set_title('Model Accuracy')
 
     for i, v in enumerate(accuracies):
         ax.text(i, v + 1, f'{v:.2f}%', ha='center', va='bottom')
@@ -85,7 +82,7 @@ def plot_accuracy(test_accuracy, train_accuracy):
     plt.show()
 
 
-def plot_predicted_probabilities(X, weights, set):
+def plot_predicted_probabilities(X, weights):
     """
     Grafica la distribución de las probabilidades predichas.
 
@@ -100,7 +97,20 @@ def plot_predicted_probabilities(X, weights, set):
     # Grafica la distribución de las probabilidades predichas
     plt.figure(figsize=(10, 6))
     sns.histplot(probabilities_test, kde=True, bins=30, color='blue')
-    plt.title(f'Distribution of Predicted Probabilities (Dataset: {set})')
     plt.xlabel('Probability')
     plt.ylabel('Frequency')
+    plt.show()
+
+
+def plot_cost(costs):
+    """
+    Dibuja la evolución del costo durante el entrenamiento.
+
+    @param costs (list): Lista de costos registrados durante cada época.
+    """
+    plt.figure(figsize=(10, 6))
+    plt.plot(costs, color='blue')
+    plt.xlabel('Epoch')
+    plt.ylabel('Cost')
+    plt.grid(True)
     plt.show()

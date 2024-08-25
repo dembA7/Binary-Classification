@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from model import gradient_descent, split_dataset, predict
-from graphs import confusion_matrix, plot_confusion_matrix, plot_accuracy, plot_predicted_probabilities
+from graphs import confusion_matrix, plot_confusion_matrix, plot_accuracy, plot_predicted_probabilities, plot_cost
 
 """
 @package docstring
@@ -51,7 +51,7 @@ def train_and_predict(data_file, learning_rate, epochs, test_size, random_state)
     weights = np.zeros(num_features)
 
     # Entreno el modelo
-    weights = gradient_descent(X_train, y_train, weights, learning_rate, epochs)
+    weights, costs = gradient_descent(X_train, y_train, weights, learning_rate, epochs)
 
     # Realizo predicciones
     test_predictions = predict(X_test, weights)
@@ -70,18 +70,20 @@ def train_and_predict(data_file, learning_rate, epochs, test_size, random_state)
 
     # Genero y muestro las matrices de confusión
     cm_test = confusion_matrix(y_test, test_predictions)
-    plot_confusion_matrix(cm_test, classes=['Edible', 'Poisonous'], title='Test Confusion Matrix')
+    plot_confusion_matrix(cm_test, classes=['Edible', 'Poisonous'])
 
     cm_train = confusion_matrix(y_train, train_predictions)
-    plot_confusion_matrix(cm_train, classes=['Edible', 'Poisonous'], title='Train Confusion Matrix')
+    plot_confusion_matrix(cm_train, classes=['Edible', 'Poisonous'])
 
     # Genero y muestro la gráfica de las probabilidades predichas en test y train
-    plot_predicted_probabilities(X_test, weights, 'Test Set')
-    plot_predicted_probabilities(X_train, weights, 'Training Set')
+    plot_predicted_probabilities(X_test, weights)
+    plot_predicted_probabilities(X_train, weights)
 
     # Genero y muestro la gráfica de precisión
     plot_accuracy(test_accuracy, train_accuracy)
 
+    # Genero y muestro la gráfica del costo durante el entrenamiento
+    plot_cost(costs)
 
 # Defino mis parámetros
 LEARNING_RATE = 0.01
