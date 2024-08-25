@@ -47,7 +47,7 @@ The dataset used for this project is the Mushroom Dataset from the UCI Machine L
 
 ### Model
 
-The logistic regression model is implemented to classify mushrooms based on the features provided. The implementation includes:
+The logistic regression model, contained in the file `model/model.py`, is implemented to classify mushrooms based on the features provided. The implementation includes:
 
 -   **Sigmoid Function**: For computing probabilities.
 -   **Cost Function**: Cross-entropy loss function.
@@ -66,14 +66,14 @@ The `model/graphs.py` file contains scripts for generating various visualization
 
 After setting up the environment and running the scripts, you can find the following outputs:
 
--   **Model Metrics**: Accuracy, confusion matrix, and other performance metrics.
--   **Visualizations**: Plots for probability distributions and cost evolution.
+-   **Model Metrics**: Accuracy, cost and other performance metrics.
+-   **Visualizations**: Plots for probability distributions, cost evolution and matrix confusions.
 
 ### License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Acknowledgments**
+### Acknowledgments
 
 -   The Mushroom Dataset from the UCI Machine Learning Repository.
 -   Various online resources and documentation used for implementing the model and visualizations.
