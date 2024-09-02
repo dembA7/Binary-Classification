@@ -1,8 +1,8 @@
-# main.py
+# regression.py
 
 import numpy as np
 import pandas as pd
-from model import gradient_descent, split_dataset, predict
+from model import gradient_descent, split_dataset, predict, compute_cost
 from graphs import confusion_matrix, plot_confusion_matrix, plot_accuracy, plot_predicted_probabilities, plot_cost
 
 """
@@ -26,7 +26,7 @@ def load_data(file_path):
     return X, y
 
 
-def train_and_predict(data_file, learning_rate, epochs, test_size, random_state):
+def train_and_predict(data_file, learning_rate, epochs, test_size, val_size, random_state):
     """
     Entrena el modelo de regresión logística y realiza predicciones.
 
@@ -40,11 +40,12 @@ def train_and_predict(data_file, learning_rate, epochs, test_size, random_state)
     X, y = load_data(data_file)
 
     # Divido el dataset en entrenamiento y prueba
-    X_train, X_test, y_train, y_test = split_dataset(X, y, test_size, random_state)
+    X_train, X_val, X_test, y_train, y_val, y_test = split_dataset(X, y, test_size, val_size, random_state)
 
     # Agrego una columna de unos para considerar el bias
     X_train = np.hstack([np.ones((X_train.shape[0], 1)), X_train])
     X_test = np.hstack([np.ones((X_test.shape[0], 1)), X_test])
+    X_val = np.hstack([np.ones((X_val.shape[0], 1)), X_val])
 
     # Inicializo los pesos
     num_features = X_train.shape[1]
@@ -56,13 +57,25 @@ def train_and_predict(data_file, learning_rate, epochs, test_size, random_state)
     # Realizo predicciones
     test_predictions = predict(X_test, weights)
     train_predictions = predict(X_train, weights)
+    val_predictions = predict(X_val, weights)
 
     # Evalúo mi precisión
     test_accuracy = np.mean(test_predictions == y_test) * 100
     train_accuracy = np.mean(train_predictions == y_train) * 100
+    val_accuracy = np.mean(val_predictions == y_val) * 100
 
     print(f"\nPrecisión en el conjunto de test: {test_accuracy:.2f}%")
-    print(f"Precisión en el conjunto de train: {train_accuracy:.2f}%\n")
+    print(f"Precisión en el conjunto de train: {train_accuracy:.2f}%")
+    print(f"Precisión en el conjunto de validation: {val_accuracy:.2f}%\n")
+
+    # Evalúo mis costos
+    test_cost = compute_cost(X_test, y_test, weights)
+    train_cost = compute_cost(X_train, y_train, weights)
+    val_cost = compute_cost(X_val, y_val, weights)
+
+    print(f"Costo en el conjunto de test: {test_cost:.4f}")
+    print(f"Costo en el conjunto de train: {train_cost:.4f}")
+    print(f"Costo en el conjunto de validation: {val_cost:.4f}\n")
 
     # Evalúo el término final del bias
     bias = weights[0]
@@ -75,12 +88,16 @@ def train_and_predict(data_file, learning_rate, epochs, test_size, random_state)
     cm_train = confusion_matrix(y_train, train_predictions)
     plot_confusion_matrix(cm_train, classes=['Edible', 'Poisonous'])
 
+    cm_val = confusion_matrix(y_val, val_predictions)
+    plot_confusion_matrix(cm_val, classes=['Edible', 'Poisonous'])
+
     # Genero y muestro la gráfica de las probabilidades predichas en test y train
     plot_predicted_probabilities(X_test, weights)
     plot_predicted_probabilities(X_train, weights)
+    plot_predicted_probabilities(X_val, weights)
 
     # Genero y muestro la gráfica de precisión
-    plot_accuracy(test_accuracy, train_accuracy)
+    plot_accuracy(test_accuracy, train_accuracy, val_accuracy)
 
     # Genero y muestro la gráfica del costo durante el entrenamiento
     plot_cost(costs)
@@ -89,6 +106,7 @@ def train_and_predict(data_file, learning_rate, epochs, test_size, random_state)
 LEARNING_RATE = 0.01
 EPOCHS = 10000
 TEST_SIZE = 0.2
+VAL_SIZE = 0.1
 RANDOM_STATE = 42
 
 # Ejecuto el entrenamiento y la predicción
@@ -98,6 +116,7 @@ if __name__ == "__main__":
         LEARNING_RATE, 
         EPOCHS, 
         TEST_SIZE, 
+        VAL_SIZE,
         RANDOM_STATE
     )
 

@@ -60,18 +60,19 @@ def plot_confusion_matrix(cm, classes):
     plt.show()
 
 
-def plot_accuracy(test_accuracy, train_accuracy):
+def plot_accuracy(test_accuracy, train_accuracy, val_accuracy):
     """
     Dibuja un gráfico de barras para la precisión del conjunto de entrenamiento y prueba.
 
     @param test_accuracy (float): Precisión en el conjunto de prueba.
     @param train_accuracy (float): Precisión en el conjunto de entrenamiento.
+    @param val_accuracy (float): Precisión en el conjunto de validación.
     """
-    labels = ['Testing Accuracy', 'Training Accuracy']
-    accuracies = [test_accuracy, train_accuracy]
+    labels = ['Testing Accuracy', 'Training Accuracy', 'Validation Accuracy']
+    accuracies = [test_accuracy, train_accuracy, val_accuracy]
 
     fig, ax = plt.subplots()
-    ax.bar(labels, accuracies, color=['blue', 'orange'])
+    ax.bar(labels, accuracies, color=['blue', 'orange', 'green'])
 
     ax.set_ylim(0, 100)
     ax.set_ylabel('Accuracy (%)')

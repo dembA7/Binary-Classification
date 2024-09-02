@@ -77,15 +77,16 @@ def gradient_descent(X, y, weights, learning_rate, epochs):
     return weights, costs
 
 
-def split_dataset(X, y, test_size=0.2, random_state=None):
+def split_dataset(X, y, test_size=0.2, val_size=0.1, random_state=None):
     """
-    Divide el dataset en conjuntos de entrenamiento y prueba.
+    Divide el dataset en conjuntos de entrenamiento, validación y prueba.
 
     @param X (ndarray): Matriz de características.
     @param y (ndarray): Matriz de etiquetas.
     @param test_size (float): Proporción del dataset a incluir en el conjunto de prueba.
+    @param val_size (float): Proporción del conjunto de entrenamiento a incluir en el conjunto de validación.
     @param random_state (int): Semilla para el generador de números aleatorios.
-    @return: Tuplas (X_train, X_test, y_train, y_test).
+    @return: Tuplas (X_train, X_val, X_test, y_train, y_val, y_test).
 
     @see https://machinelearningmastery.com/how-to-choose-the-right-test-options-when-evaluating-machine-learning-algorithms/
     @see https://www.v7labs.com/blog/train-validation-test-set
@@ -96,16 +97,23 @@ def split_dataset(X, y, test_size=0.2, random_state=None):
     indices = np.arange(X.shape[0])
     np.random.shuffle(indices)
 
-    split_index = int(X.shape[0] * (1 - test_size))
-    train_indices = indices[:split_index]
-    test_indices = indices[split_index:]
+    test_split_index = int(X.shape[0] * (1 - test_size))
+    train_indices = indices[:test_split_index]
+    test_indices = indices[test_split_index:]
 
-    X_train = X[train_indices]
+    val_split_index = int(train_indices.shape[0] * (1 - val_size))
+    train_indices_final = train_indices[:val_split_index]
+    val_indices = train_indices[val_split_index:]
+
+    X_train = X[train_indices_final]
+    X_val = X[val_indices]
     X_test = X[test_indices]
-    y_train = y[train_indices]
+    
+    y_train = y[train_indices_final]
+    y_val = y[val_indices]
     y_test = y[test_indices]
 
-    return X_train, X_test, y_train, y_test
+    return X_train, X_val, X_test, y_train, y_val, y_test
 
 
 def predict(X, weights):
