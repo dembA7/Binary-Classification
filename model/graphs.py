@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from model import sigmoid
+from regression import sigmoid
 
 """
 @package docstring

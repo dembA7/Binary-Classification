@@ -1,122 +1,130 @@
 # regression.py
 
 import numpy as np
-import pandas as pd
-from model import gradient_descent, split_dataset, predict, compute_cost
-from graphs import confusion_matrix, plot_confusion_matrix, plot_accuracy, plot_predicted_probabilities, plot_cost
 
 """
 @package docstring
-Este módulo contiene funciones para realizar predicciones con un modelo de regresión logística.
+Este módulo contiene las funciones de un modelo de regresión logística utilizando la función sigmoide, el descenso de gradiente
+y la entropía cruzada binaria como función de pérdida.
 
 @see https://en.wikipedia.org/wiki/Logistic_regression
 @see https://www.beyondphdcoaching.com/dissertation/binary-logistic-regression/
 """
 
-def load_data(file_path):
+def sigmoid(z):
     """
-    Carga los datos transformados desde un archivo y los divide en características y etiquetas.
+    Calcula la función sigmoide para la entrada z.
 
-    @param file_path: Ruta del archivo de datos.
-    @return: Tuplas (X, y), donde X son las características y y son las etiquetas.
+    @param z (ndarray): Entrada para la función sigmoide.
+    @return h ndarray: Resultados de aplicar la función sigmoide a la entrada z.
+
+    @see https://en.wikipedia.org/wiki/Sigmoid_function
     """
-    data = pd.read_csv(file_path, header=None)
-    X = data.iloc[:, 1:].values
-    y = data.iloc[:, 0].values
-    return X, y
+    return 1 / (1 + np.exp(-z))
 
 
-def train_and_predict(data_file, learning_rate, epochs, test_size, val_size, random_state):
+def compute_cost(X, y, weights):
     """
-    Entrena el modelo de regresión logística y realiza predicciones.
+    Calcula el costo (función de pérdida) de la regresión logística.
+    Mide qué tan bien el modelo se ajusta a los datos de entrenamiento.
+    Al ser una regresión logística binaria, el costo es la entropía cruzada binaria.
 
-    @param data_file: Ruta del archivo con los datos.
-    @param learning_rate: Tasa de aprendizaje para el descenso de gradiente.
-    @param epochs: Número de épocas para el descenso de gradiente.
-    @param test_size: Proporción del dataset a utilizar para pruebas.
-    @param random_state: Semilla para el generador de números aleatorios.
+        @param X (ndarray): Matriz de características.
+        @param y (ndarray): Vector de etiquetas para la clase específica.
+        @param weights (ndarray): Vector de pesos para la clase específica.
+        @return float: Valor del costo calculado.
+
+        @see https://en.wikipedia.org/wiki/Cross_entropy
+        @see https://machinelearningmastery.com/cross-entropy-for-machine-learning/
+        @see https://towardsdatascience.com/understanding-binary-cross-entropy-log-loss-a-visual-explanation-a3ac6025181a
+        @see https://www.analyticsvidhya.com/blog/2020/11/binary-cross-entropy-aka-log-loss-the-cost-function-used-in-logistic-regression/
     """
-    # Cargo los datos
-    X, y = load_data(data_file)
+    m = X.shape[0]
+    z = np.dot(X, weights)
+    h = sigmoid(z)
+    cost = -np.sum(y * np.log(h) + (1 - y) * np.log(1 - h)) / m
+    return cost
 
-    # Divido el dataset en entrenamiento y prueba
-    X_train, X_val, X_test, y_train, y_val, y_test = split_dataset(X, y, test_size, val_size, random_state)
 
-    # Agrego una columna de unos para considerar el bias
-    X_train = np.hstack([np.ones((X_train.shape[0], 1)), X_train])
-    X_test = np.hstack([np.ones((X_test.shape[0], 1)), X_test])
-    X_val = np.hstack([np.ones((X_val.shape[0], 1)), X_val])
+def gradient_descent(X, y, weights, learning_rate, epochs):
+    """
+    Realiza el algoritmo de descenso de gradiente para optimizar los pesos.
 
-    # Inicializo los pesos
-    num_features = X_train.shape[1]
-    weights = np.zeros(num_features)
+        @param X (ndarray): Matriz de características.
+        @param y (ndarray): Matriz de etiquetas en formato one-hot.
+        @param weights (ndarray): Matriz de pesos.
+        @param learning_rate (float): Tasa de aprendizaje para la actualización de los pesos.
+        @param epochs (int): Número de iteraciones para el descenso de gradiente.
+        @return ndarray: Matriz de pesos optimizados después de aplicar el descenso de gradiente.
 
-    # Entreno el modelo
-    weights, costs = gradient_descent(X_train, y_train, weights, learning_rate, epochs)
+        @see https://en.wikipedia.org/wiki/Gradient_descent
+        @see https://www.geeksforgeeks.org/how-to-implement-a-gradient-descent-in-python-to-find-a-local-minimum/
+        @see https://induraj2020.medium.com/implementing-gradient-descent-in-python-d1c6aeb9a448
+        @see https://www.youtube.com/watch?v=IHZwWFHWa-w
+        @see https://www.youtube.com/watch?v=sDv4f4s2SB8
+    """
+    costs = []
+    m = X.shape[0]
 
-    # Realizo predicciones
-    test_predictions = predict(X_test, weights)
-    train_predictions = predict(X_train, weights)
-    val_predictions = predict(X_val, weights)
+    for i in range(epochs):
+        z = np.dot(X, weights)
+        h = sigmoid(z)
+        gradient = np.dot(X.T, (h - y)) / m
+        weights -= learning_rate * gradient
+        cost = compute_cost(X, y, weights)
+        costs.append(cost)
+        print(f"Epoch {i + 1}, Cost: {cost}")
 
-    # Evalúo mi precisión
-    test_accuracy = np.mean(test_predictions == y_test) * 100
-    train_accuracy = np.mean(train_predictions == y_train) * 100
-    val_accuracy = np.mean(val_predictions == y_val) * 100
+    return weights, costs
 
-    print(f"\nPrecisión en el conjunto de test: {test_accuracy:.2f}%")
-    print(f"Precisión en el conjunto de train: {train_accuracy:.2f}%")
-    print(f"Precisión en el conjunto de validation: {val_accuracy:.2f}%\n")
 
-    # Evalúo mis costos
-    test_cost = compute_cost(X_test, y_test, weights)
-    train_cost = compute_cost(X_train, y_train, weights)
-    val_cost = compute_cost(X_val, y_val, weights)
+def split_dataset(X, y, test_size=0.2, val_size=0.1, random_state=None):
+    """
+    Divide el dataset en conjuntos de entrenamiento, validación y prueba.
 
-    print(f"Costo en el conjunto de test: {test_cost:.4f}")
-    print(f"Costo en el conjunto de train: {train_cost:.4f}")
-    print(f"Costo en el conjunto de validation: {val_cost:.4f}\n")
+    @param X (ndarray): Matriz de características.
+    @param y (ndarray): Matriz de etiquetas.
+    @param test_size (float): Proporción del dataset a incluir en el conjunto de prueba.
+    @param val_size (float): Proporción del conjunto de entrenamiento a incluir en el conjunto de validación.
+    @param random_state (int): Semilla para el generador de números aleatorios.
+    @return: Tuplas (X_train, X_val, X_test, y_train, y_val, y_test).
 
-    # Evalúo el término final del bias
-    bias = weights[0]
-    print(f"Término del bias: {bias:.4f}\n")
+    @see https://machinelearningmastery.com/how-to-choose-the-right-test-options-when-evaluating-machine-learning-algorithms/
+    @see https://www.v7labs.com/blog/train-validation-test-set
+    """
+    if random_state is not None:
+        np.random.seed(random_state)
 
-    # Genero y muestro las matrices de confusión
-    cm_test = confusion_matrix(y_test, test_predictions)
-    plot_confusion_matrix(cm_test, classes=['Edible', 'Poisonous'])
+    indices = np.arange(X.shape[0])
+    np.random.shuffle(indices)
 
-    cm_train = confusion_matrix(y_train, train_predictions)
-    plot_confusion_matrix(cm_train, classes=['Edible', 'Poisonous'])
+    test_split_index = int(X.shape[0] * (1 - test_size))
+    train_indices = indices[:test_split_index]
+    test_indices = indices[test_split_index:]
 
-    cm_val = confusion_matrix(y_val, val_predictions)
-    plot_confusion_matrix(cm_val, classes=['Edible', 'Poisonous'])
+    val_split_index = int(train_indices.shape[0] * (1 - val_size))
+    train_indices_final = train_indices[:val_split_index]
+    val_indices = train_indices[val_split_index:]
 
-    # Genero y muestro la gráfica de las probabilidades predichas en test y train
-    plot_predicted_probabilities(X_test, weights)
-    plot_predicted_probabilities(X_train, weights)
-    plot_predicted_probabilities(X_val, weights)
+    X_train = X[train_indices_final]
+    X_val = X[val_indices]
+    X_test = X[test_indices]
+    
+    y_train = y[train_indices_final]
+    y_val = y[val_indices]
+    y_test = y[test_indices]
 
-    # Genero y muestro la gráfica de precisión
-    plot_accuracy(test_accuracy, train_accuracy, val_accuracy)
+    return X_train, X_val, X_test, y_train, y_val, y_test
 
-    # Genero y muestro la gráfica del costo durante el entrenamiento
-    plot_cost(costs)
 
-# Defino mis parámetros
-LEARNING_RATE = 0.01
-EPOCHS = 10000
-TEST_SIZE = 0.2
-VAL_SIZE = 0.1
-RANDOM_STATE = 42
+def predict_regression(X, weights):
+    """
+    Realiza predicciones utilizando un modelo de regresión logística binaria.
 
-# Ejecuto el entrenamiento y la predicción
-if __name__ == "__main__":
-    train_and_predict(
-        'dataset/processed.data', 
-        LEARNING_RATE, 
-        EPOCHS, 
-        TEST_SIZE, 
-        VAL_SIZE,
-        RANDOM_STATE
-    )
-
+    @param X (ndarray): Matriz de características de las muestras a predecir.
+    @param weights (ndarray): Matriz de pesos entrenados del modelo.
+    @return ndarray: Un vector de predicciones que contiene la clase predicha para cada muestra.
+    """
+    linear_model = np.dot(X, weights)
+    predictions = sigmoid(linear_model)
+    return predictions >= 0.5
