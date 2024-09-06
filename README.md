@@ -45,6 +45,8 @@ To get started with this project, follow these steps:
 
 The dataset used for this project is the Mushroom Dataset from the UCI Machine Learning Repository. It contains various attributes related to mushrooms, such as color, odor, and habitat, and is used to predict whether a mushroom is edible or poisonous.
 
+### Models
+
 #### Logistic Regression
 
 The logistic regression model is implemented in `model/regression.py` and is used to classify mushrooms based on the features provided. The implementation includes:
@@ -61,6 +63,11 @@ The random forest model is implemented in `model/forest.py` and builds multiple 
 -   **Bagging**: Sampling subsets of data and features for each tree.
 -   **Majority Voting**: Combining tree predictions for classification.
 -   **Evaluation**: Accuracy and confusion matrix.
+
+#### Tuning
+
+The `model/tuning.py` script performs a grid search for optimizing the learning rate and number of epochs for the logistic regression model, using a validation set. It identifies the best set of hyperparameters to maximize accuracy.
+
 
 ### Visualizations
 
