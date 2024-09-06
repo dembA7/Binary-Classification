@@ -29,15 +29,15 @@ def compute_cost(X, y, weights):
     Mide qué tan bien el modelo se ajusta a los datos de entrenamiento.
     Al ser una regresión logística binaria, el costo es la entropía cruzada binaria.
 
-        @param X (ndarray): Matriz de características.
-        @param y (ndarray): Vector de etiquetas para la clase específica.
-        @param weights (ndarray): Vector de pesos para la clase específica.
-        @return float: Valor del costo calculado.
+    @param X (ndarray): Matriz de características.
+    @param y (ndarray): Vector de etiquetas para la clase específica.
+    @param weights (ndarray): Vector de pesos para la clase específica.
+    @return float: Valor del costo calculado.
 
-        @see https://en.wikipedia.org/wiki/Cross_entropy
-        @see https://machinelearningmastery.com/cross-entropy-for-machine-learning/
-        @see https://towardsdatascience.com/understanding-binary-cross-entropy-log-loss-a-visual-explanation-a3ac6025181a
-        @see https://www.analyticsvidhya.com/blog/2020/11/binary-cross-entropy-aka-log-loss-the-cost-function-used-in-logistic-regression/
+    @see https://en.wikipedia.org/wiki/Cross_entropy
+    @see https://machinelearningmastery.com/cross-entropy-for-machine-learning/
+    @see https://towardsdatascience.com/understanding-binary-cross-entropy-log-loss-a-visual-explanation-a3ac6025181a
+    @see https://www.analyticsvidhya.com/blog/2020/11/binary-cross-entropy-aka-log-loss-the-cost-function-used-in-logistic-regression/
     """
     m = X.shape[0]
     z = np.dot(X, weights)
