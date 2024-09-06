@@ -6,7 +6,6 @@ import pandas as pd
 from graphs import confusion_matrix, plot_confusion_matrix, plot_accuracy, plot_predicted_probabilities, plot_cost
 from regression import gradient_descent, split_dataset, predict_regression, compute_cost
 from forest import train_random_forest, predict_forest
-
 from sklearn.metrics import accuracy_score
 
 """
@@ -32,7 +31,7 @@ def load_data(file_path):
     return X, y
 
 
-def train_and_predict_regression(data_file, learning_rate, epochs, test_size, val_size, random_state):
+def train_and_predict_regression(data_file, learning_rate, epochs, test_size, val_size, random_state, patience):
     """
     Entrena el modelo de regresión logística y realiza predicciones.
 
@@ -68,7 +67,7 @@ def train_and_predict_regression(data_file, learning_rate, epochs, test_size, va
     weights = np.zeros(num_features)
 
     # Entreno el modelo
-    weights, costs = gradient_descent(X_train, y_train, weights, learning_rate, epochs)
+    weights, costs_train, costs_val,  = gradient_descent(X_train, y_train, X_val, y_val, weights, learning_rate, epochs, patience)
 
     # Realizo predicciones
     test_predictions = predict_regression(X_test, weights)
@@ -118,7 +117,8 @@ def train_and_predict_regression(data_file, learning_rate, epochs, test_size, va
     plot_accuracy(test_accuracy, train_accuracy, val_accuracy)
 
     # Genero y muestro la gráfica del costo durante el entrenamiento
-    plot_cost(costs)
+    plot_cost(costs_train)
+    plot_cost(costs_val)
 
 
 def train_and_predict_forest(data_file, test_size, val_size, random_state):
@@ -126,9 +126,8 @@ def train_and_predict_forest(data_file, test_size, val_size, random_state):
     Entrena el modelo de random forest y realiza predicciones.
 
     @param data_file: Ruta del archivo con los datos.
-    @param learning_rate: Tasa de aprendizaje para el descenso de gradiente.
-    @param epochs: Número de épocas para el descenso de gradiente.
     @param test_size: Proporción del dataset a utilizar para pruebas.
+    @param val_size: Proporción del dataset a utilizar para validación.
     @param random_state: Semilla para el generador de números aleatorios.
     """
 
@@ -174,26 +173,30 @@ def train_and_predict_forest(data_file, test_size, val_size, random_state):
     cm_val = confusion_matrix(y_val, val_predictions)
     plot_confusion_matrix(cm_val, classes=['Edible', 'Poisonous'])
 
-# Defino mis parámetros
-LEARNING_RATE = 0.01
-EPOCHS = 10000
+
+# Defino mis parámetros e hipérparámetros
+DATA_FILE = 'dataset/processed.data'
+LEARNING_RATE = 0.05
+EPOCHS = 50000
 TEST_SIZE = 0.2
 VAL_SIZE = 0.1
 RANDOM_STATE = 42
+PATIENCE = 15
 
 # Ejecuto el entrenamiento y la predicción de mis modelos
 if __name__ == "__main__":
     train_and_predict_regression(
-        'dataset/processed.data', 
+        DATA_FILE, 
         LEARNING_RATE, 
         EPOCHS, 
         TEST_SIZE, 
         VAL_SIZE,
-        RANDOM_STATE
+        RANDOM_STATE,
+        PATIENCE
     )
 
     train_and_predict_forest(
-        'dataset/processed.data',
+        DATA_FILE,
         TEST_SIZE,
         VAL_SIZE,
         RANDOM_STATE

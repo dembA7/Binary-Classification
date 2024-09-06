@@ -46,36 +46,55 @@ def compute_cost(X, y, weights):
     return cost
 
 
-def gradient_descent(X, y, weights, learning_rate, epochs):
+def gradient_descent(X_train, y_train, X_val, y_val, weights, learning_rate, epochs, patience):
     """
-    Realiza el algoritmo de descenso de gradiente para optimizar los pesos.
+    Realiza el algoritmo de descenso de gradiente para optimizar los pesos,
+    incluyendo monitoreo del conjunto de validación y detención temprana.
 
-        @param X (ndarray): Matriz de características.
-        @param y (ndarray): Matriz de etiquetas en formato one-hot.
-        @param weights (ndarray): Matriz de pesos.
-        @param learning_rate (float): Tasa de aprendizaje para la actualización de los pesos.
-        @param epochs (int): Número de iteraciones para el descenso de gradiente.
-        @return ndarray: Matriz de pesos optimizados después de aplicar el descenso de gradiente.
-
-        @see https://en.wikipedia.org/wiki/Gradient_descent
-        @see https://www.geeksforgeeks.org/how-to-implement-a-gradient-descent-in-python-to-find-a-local-minimum/
-        @see https://induraj2020.medium.com/implementing-gradient-descent-in-python-d1c6aeb9a448
-        @see https://www.youtube.com/watch?v=IHZwWFHWa-w
-        @see https://www.youtube.com/watch?v=sDv4f4s2SB8
+    @param X_train (ndarray): Matriz de características de entrenamiento.
+    @param y_train (ndarray): Matriz de etiquetas de entrenamiento.
+    @param X_val (ndarray): Matriz de características de validación.
+    @param y_val (ndarray): Matriz de etiquetas de validación.
+    @param weights (ndarray): Matriz de pesos.
+    @param learning_rate (float): Tasa de aprendizaje para la actualización de los pesos.
+    @param epochs (int): Número de iteraciones para el descenso de gradiente.
+    @param patience (int): Número de épocas que se esperará antes de detener el entrenamiento si no mejora el conjunto de validación.
+    @return tuple: Matriz de pesos optimizados y lista de costos durante el entrenamiento.
     """
-    costs = []
-    m = X.shape[0]
+    costs_train = []
+    costs_val = []
+    m = X_train.shape[0]
+    
+    best_val_cost = float('inf')
+    best_weights = None
+    patience_counter = 0
 
     for i in range(epochs):
-        z = np.dot(X, weights)
-        h = sigmoid(z)
-        gradient = np.dot(X.T, (h - y)) / m
+        z_train = np.dot(X_train, weights)
+        h_train = sigmoid(z_train)
+        gradient = np.dot(X_train.T, (h_train - y_train)) / m
         weights -= learning_rate * gradient
-        cost = compute_cost(X, y, weights)
-        costs.append(cost)
-        print(f"Epoch {i + 1}, Cost: {cost}")
+        
+        cost_train = compute_cost(X_train, y_train, weights)
+        costs_train.append(cost_train)
+        
+        cost_val = compute_cost(X_val, y_val, weights)
+        costs_val.append(cost_val)
+        
+        print(f"Epoch {i + 1}, Training Cost: {cost_train:.8f}, Validation Cost: {cost_val:.8f}")
 
-    return weights, costs
+        if cost_val < best_val_cost:
+            best_val_cost = cost_val
+            best_weights = weights.copy()
+            patience_counter = 0 
+        else:
+            patience_counter += 1
+        
+        if patience_counter >= patience:
+            print("Stopping training due to no improvement in validation set.")
+            break
+
+    return best_weights, costs_train, costs_val
 
 
 def split_dataset(X, y, test_size=0.2, val_size=0.1, random_state=None):
