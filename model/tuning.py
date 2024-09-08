@@ -14,7 +14,7 @@ def main():
     X, y = load_data("dataset/processed.data")
     X_train, X_val, X_test, y_train, y_val, y_test = split_dataset(X, y, test_size=0.2, val_size=0.1, random_state=42)
     
-    learning_rates = [0.001, 0.005, 0.01, 0.05, 0.1]
+    learning_rates = [0.001, 0.003, 0.005, 0.01, 0.03, 0.05, 0.1]
     epochs = 10000
     results = []
     patience = 10
