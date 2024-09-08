@@ -177,7 +177,7 @@ def train_and_predict_forest(data_file, test_size, val_size, random_state):
 # Defino mis parámetros e hipérparámetros
 DATA_FILE = 'dataset/processed.data'
 LEARNING_RATE = 0.05
-EPOCHS = 50000
+EPOCHS = 10000
 TEST_SIZE = 0.2
 VAL_SIZE = 0.1
 RANDOM_STATE = 42
